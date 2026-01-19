@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/urfave/cli/v2"
 )
 
 var pool *pgxpool.Pool
@@ -34,5 +36,14 @@ func init() {
 }
 
 func main() {
+  app := &cli.App{
+    Name: "GoTodo",
+    Usage: "A simple cli program to manage your tasks",
+    Commands: []*cli.Command{},
+  }
 
+  err := app.Run(os.Args)
+  if err != nil {
+    log.Fatal(err)
+  }
 }
