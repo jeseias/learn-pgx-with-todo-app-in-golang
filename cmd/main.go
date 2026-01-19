@@ -97,3 +97,22 @@ func getAllTasks() ([]Task, error) {
 
   return tasks, nil
 }
+
+func completeTask(id int) error {
+  sql := `
+    UPDATE tasks
+    SET completed = true, updated_at = NOW()
+    WHERE id = $1
+  `
+
+  commandTag, err := pool.Exec(ctx, sql, id)
+  if err != nil {
+    return fmt.Errorf("error completing task: %w", err)
+  }
+
+  if commandTag.RowsAffected() == 0 {
+    return fmt.Errorf("no task found with id %d", id)
+  }
+
+  return nil
+}
