@@ -116,3 +116,18 @@ func completeTask(id int) error {
 
   return nil
 }
+
+func deleteTask(id int) error {
+  sql := `DELETE FROM tasks WHERE id = $1`
+
+  commandTag, err := pool.Exec(ctx, sql, id)
+  if err != nil {
+    return fmt.Errorf("error while deleting task with id: %d", id)
+  }
+
+  if commandTag.RowsAffected() == 0 {
+    return fmt.Errorf("no task found with id %d", id)
+  }
+
+  return nil
+}
