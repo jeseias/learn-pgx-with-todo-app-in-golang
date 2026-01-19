@@ -208,3 +208,19 @@ func getCompletedTasks() ([]Task, error) {
 
   return tasks, nil
 }
+
+func printTask(tasks []Task) {
+  if len(tasks) == 0 {
+    fmt.Println("No tasks found")
+    return
+  }
+
+  for _, task := range tasks {
+    status := "[ ]"
+    if task.Completed {
+      status = "[✓]"
+    }
+
+    fmt.Printf("%d. %s %s (Created: %s)\n", task.ID, status, task.Text, task.CreatedAt.Format("2006-01-02 15:04:05"))
+  }
+}
