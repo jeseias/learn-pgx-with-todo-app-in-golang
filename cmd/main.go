@@ -76,6 +76,7 @@ func getAllTasks() ([]Task, error) {
   if err != nil {
     return nil, fmt.Errorf("error querying  tasks: %w", err)
   }
+  defer rows.Close()
 
   var tasks []Task
   for rows.Next() {
@@ -130,4 +131,42 @@ func deleteTask(id int) error {
   }
 
   return nil
+}
+
+func getPendingTasks() ([]Task, error) {
+  sql := `
+    SELECT id, text, completed, created_at, updated_at 
+    FROM tasks
+    WHERE completed = false
+    ORDER BY created_at DESC
+  `
+
+  rows, err := pool.Query(ctx, sql)
+  if err != nil {
+    return nil, fmt.Errorf("error querying pending tasks: %w", err)
+  }
+  defer rows.Close()
+  
+  var tasks []Task 
+  for rows.Next() {
+    var task Task 
+    err := rows.Scan(
+      &task.ID,
+      &task.Text,
+      &task.Completed,
+      &task.CreatedAt,
+      &task.UpdatedAt,
+    )
+    if err != nil {
+      return nil, fmt.Errorf("error scanning task row: %w", err)
+    }
+
+    tasks = append(tasks, task)
+  }
+
+  if err := rows.Err(); err != nil {
+    return nil, fmt.Errorf("error iterating task row: %w", err)
+  }
+
+  return tasks, nil
 }
