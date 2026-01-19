@@ -47,3 +47,20 @@ func main() {
     log.Fatal(err)
   }
 }
+
+func createTask(text string) error {
+  sql := `
+    INSERT INTO tasks (text, completed)
+    VALUES ($1, $2)
+    RETURNING id
+  `
+
+  var id int 
+  err := pool.QueryRow(ctx, sql, text, false).Scan(&id)
+  if err != nil {
+    return fmt.Errorf("error creating task: %w", err)
+  }
+
+  fmt.Printf("Created task successfully with ID: %d\n", id)
+  return nil
+}
