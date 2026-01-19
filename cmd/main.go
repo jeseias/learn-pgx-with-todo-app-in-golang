@@ -64,3 +64,36 @@ func createTask(text string) error {
   fmt.Printf("Created task successfully with ID: %d\n", id)
   return nil
 }
+
+func getAllTasks() ([]Task, error) {
+  sql := `
+    SELECT id, text, completed, created_at, updated_at
+    FROM tasks
+    ORDER BY created_at DESC
+  `
+
+  rows, err := pool.Query(ctx, sql)
+  if err != nil {
+    return nil, fmt.Errorf("error querying  tasks: %w", err)
+  }
+
+  var tasks []Task
+  for rows.Next() {
+    var task Task
+    err := rows.Scan(
+      &task.ID,
+      &task.Text,
+      &task.Completed,
+      &task.CreatedAt,
+      &task.UpdatedAt,
+    )
+
+    if err !=nil {
+      return nil, fmt.Errorf("Error scan task row: %w", err)
+    }
+
+    tasks = append(tasks, task)
+  }
+
+  return tasks, nil
+}
